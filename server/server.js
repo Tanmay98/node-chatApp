@@ -10,25 +10,24 @@ var app = express();
 var server = http.createServer(app)
 var io = socketIO(server);
 
+app.use(express.static(publicPath));
+
 io.on('connection', (socket) => {
 	console.log('New user connected');
 
-	socket.emit('newMessage', {
-		from: 'tanmay',
-		text: 'haw ya doin',
-		createdAt: 123
-	});
-
-	socket.on('createMessage', (newMessage) => {
-		console.log('new Message', newMessage)
+	socket.on('createMessage', (message) => {
+		console.log('new Message', message);
+		io.emit('newMessage', {
+			from: message.from,
+			text: message.text,
+			createdAt: new Date().getTime()
+		});
 	});
 
 	socket.on('disconnect', () => {
 		console.log('Connection lost');
 	});
 });
-
-app.use(express.static(publicPath));
 
 server.listen(3000, () => {
 	console.log(`server starting at ${port}`);
